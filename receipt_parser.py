@@ -3,7 +3,17 @@ import os
 import re
 
 
-def parse_receipts() -> set:
+# gets only text that is located after Grocery section and before mPerks section on receipt
+# uses regex and gets all text that is 4 digits or more which are the upc
+def filter_product_upc(receipt: str) -> list:
+    products = receipt.partition("GROCERY")[2].partition("mPerks")[0]
+    upc = re.findall("(\\d{4,})", products)
+    return upc
+
+
+# gets all receipts in folder and reads each one then
+# returns a set of product codes from grocery section of each receipt
+def parse_pdf_receipts() -> set:
     receipts = os.listdir("receipts")
     upc_set = set()
 
@@ -20,12 +30,3 @@ def parse_receipts() -> set:
         file.close()
 
     return upc_set
-
-
-def filter_product_upc(receipt: str) -> list:
-    products = receipt.partition("GROCERY")[2].partition("mPerks")[0]
-    upc = re.findall("(\\d{4,})", products)
-    return upc
-
-
-
