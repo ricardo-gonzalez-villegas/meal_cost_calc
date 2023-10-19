@@ -32,12 +32,12 @@ def scrape_product_info_by_upc(upc: str) -> dict:
 
     try:
         prod_title = driver.find_element(By.CLASS_NAME, value="product-tile__title")
-        product_info = parse_product_info(title=prod_title.text)
+        print(upc)
+        product_info = parse_product_info(title=prod_title.text, upc=upc)
 
         prod_price = driver.find_element(By.CLASS_NAME, value="product-tile__regular-price-text")
         product_info["price"] = prod_price.text.replace('$', '')
 
-        product_info["upc"] = upc
     except NoSuchElementException:
         return product_info
 
@@ -47,10 +47,10 @@ def scrape_product_info_by_upc(upc: str) -> dict:
 
     driver.quit()
 
-    return product_info
+    return {f"{upc}": product_info}
 
 
-def parse_product_info(title: str) -> dict:
+def parse_product_info(title: str, upc: str) -> dict:
     if "-" in title:
         info = title.split("-")
         name = info[0].strip()
@@ -63,6 +63,10 @@ def parse_product_info(title: str) -> dict:
             name = name[0]
         else:
             name = title.strip()
+        return {"name": name}
+
+    # returns only produce name
+    if len(upc) <= 4:
         return {"name": name}
 
     # if there is a space in description string splits it and returns first part of string
